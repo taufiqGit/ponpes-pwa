@@ -10,6 +10,7 @@ vi.mock('@/lib/axios', () => ({
 
 import { axiosInstance } from '@/lib/axios'
 import { LoginForm } from '@/components/login-form'
+import { useAuthStore } from '@/store/auth'
 
 // Mock useRouter
 vi.mock('next/navigation', () => ({
@@ -37,6 +38,8 @@ function renderLoginForm() {
 describe('LoginForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    useAuthStore.setState({ user: null })
+    localStorage.clear()
   })
 
   it('renders login form correctly', () => {
@@ -81,9 +84,12 @@ describe('LoginForm', () => {
     await waitFor(() => {
       expect(axiosInstance.post).toHaveBeenCalledWith('/api/auth/login', {
         identifier: 'test@example.com',
-        password: 'password123',
+        usr_password: 'password123',
       })
     })
+
+    expect(useAuthStore.getState().user?.name).toBe('Test User')
+    expect(localStorage.getItem('auth_token')).toBe('token')
   })
 
   it('shows error message on failed login', async () => {

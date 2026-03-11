@@ -67,9 +67,9 @@ export function PWAInstallPrompt() {
     <div className="fixed bottom-4 right-4 z-50 bg-card border border-border rounded-lg shadow-lg p-4 max-w-sm animate-in slide-in-from-bottom-4 duration-300">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
-          <h3 className="font-semibold text-sm mb-1">Install Notes App</h3>
+          <h3 className="font-semibold text-sm mb-1">Install An-Nashriyyah App</h3>
           <p className="text-xs text-muted-foreground">
-            Install Notes to your home screen for quick access
+            Install An-Nashriyyah to your home screen for quick access
           </p>
         </div>
         <button

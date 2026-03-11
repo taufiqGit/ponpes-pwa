@@ -1,9 +1,22 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import Page from '@/app/page'
 
+vi.mock('@/api/auth', () => ({
+  useAccountMe: () => ({
+    data: {
+      usr_full_name: 'Orang Tua',
+      santri_ids: [
+        { id: 'zaidan', nama: 'Muhammad Zaidan (Kelas 8A)', nis: '001' },
+        { id: 'fatimah', nama: 'Siti Fatimah (Kelas 7B)', nis: '002' },
+      ],
+    },
+  }),
+}))
+
 function renderPage() {
+  localStorage.setItem('auth_token', 'test-token')
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },

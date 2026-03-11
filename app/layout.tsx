@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/sonner'
+import { PWAInstallPrompt } from '@/components/pwa-install-prompt'
 import { SWRegister } from '@/components/sw-register'
 import { QueryProvider } from '@/components/query-provider'
 import './globals.css'
@@ -11,24 +12,24 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Notes PWA',
-  description: 'Modern offline-first notes app with cloud sync',
-  generator: 'v0.app',
+  title: 'An-Nashriyyah App',
+  description: 'Modern offline-first An-Nashriyyah App with cloud sync',
+  generator: 'An-Nashriyyah App',
   manifest: '/manifest.json',
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
+        url: '/logo.png',
         media: '(prefers-color-scheme: light)',
       },
       {
-        url: '/icon-dark-32x32.png',
+        url: '/logo.png',
         media: '(prefers-color-scheme: dark)',
       },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
+      // {
+      //   url: '/icon.svg',
+      //   type: 'image/svg+xml',
+      // },
     ],
     apple: '/apple-icon.png',
   },
@@ -57,6 +58,7 @@ export default function RootLayout({
           <QueryProvider>
             <SWRegister />
             {children}
+            <PWAInstallPrompt />
             <Toaster />
             <Analytics />
           </QueryProvider>

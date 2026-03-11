@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import Image from 'next/image'
 import { Star } from 'lucide-react'
 import { LoginForm } from '@/components/login-form'
+import { RedirectIfAuthed } from '@/components/auth-guard'
 
 export const metadata: Metadata = {
   title: 'Login - Santri App',
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
+    <RedirectIfAuthed>
     <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Header with Logo */}
@@ -52,7 +54,7 @@ export default function LoginPage() {
               </div>
             </div>
           </div>
-          {process.env.NEXT_PUBLIC_URL_API}pp
+          
           {/* Login Form */}
           <LoginForm />
         </div>
@@ -65,5 +67,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+    </RedirectIfAuthed>
   )
 }

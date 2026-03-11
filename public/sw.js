@@ -7,7 +7,7 @@ const URLS_TO_CACHE = [
 
 // Install event
 self.addEventListener('install', (event) => {
-  console.log('[v0] Service Worker installing...')
+  console.log('An-Nashriyyah Service Worker installing...')
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[v0] Cache opened')
@@ -19,13 +19,13 @@ self.addEventListener('install', (event) => {
 
 // Activate event
 self.addEventListener('activate', (event) => {
-  console.log('[v0] Service Worker activating...')
+  console.log('An-Nashriyyah Service Worker activating...')
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log('[v0] Deleting old cache:', cacheName)
+            console.log('An-Nashriyyah Deleting old cache:', cacheName)
             return caches.delete(cacheName)
           }
         })
@@ -84,15 +84,17 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {}
   const options = {
-    body: data.body || 'New notification from Notes App',
+    body: data.body || 'New notification from An-Nashriyyah App',
     icon: '/icon-192x192.png',
     badge: '/icon-96x96.png',
     tag: 'notes-notification',
     requireInteraction: false,
   }
 
+
+
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Notes App', options)
+    self.registration.showNotification(data.title || 'An-Nashriyyah App', options)
   )
 })
 

@@ -5,7 +5,6 @@ import { useEffect } from 'react'
 export function SWRegister() {
   useEffect(() => {
     if (
-      process.env.NODE_ENV === 'production' &&
       'serviceWorker' in navigator &&
       (window.location.protocol === 'https:' || window.location.hostname === 'localhost')
     ) {

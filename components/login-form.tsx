@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { useLogin } from '@/api/auth'
+import { useAuthStore } from '@/store/auth'
 
 const loginSchema = z.object({
   identifier: z.string().min(1, 'Email atau No. Handphone wajib diisi'),
@@ -32,34 +33,59 @@ type LoginFormValues = z.infer<typeof loginSchema>
 export function LoginForm() {
   const router = useRouter()
   const [showPassword, setShowPassword] = React.useState(false)
-  const { mutate: login, isPending } = useLogin({
-    onSuccess: (data) => {
-      toast.success('Login berhasil!', {
-        description: `Selamat datang kembali, ${data?.user?.name ?? 'o'}`,
-      })
-      console.log(data, 'ans')
-      if (false) {
-        // In a real app, this might set a persistent cookie or token
-        localStorage.setItem('rememberMe', 'true')
-      }
-
-      // Redirect to dashboard/home
-      router.push('/')
-      router.refresh()
-    },
-    onError: (error: any) => {
-      toast.error('Login gagal', {
-        description: error instanceof Error ? error.message : 'Terjadi kesalahan saat login',
-      })
-    },
-  })
-
+  const setUser = useAuthStore((state) => state.setUser)
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       identifier: '',
       password: '',
       rememberMe: false,
+    },
+  })
+
+  const { mutate: login, isPending } = useLogin({
+    onSuccess: (data) => {
+      const user = (data as any)?.user ?? (data as any)?.data?.user ?? null
+      const token =
+        (data as any)?.access_token ??
+        (data as any)?.token ??
+        (data as any)?.data?.access_token ??
+        (data as any)?.data?.token
+
+      const displayName =
+        user?.usr_full_name ??
+        user?.name ??
+        'User'
+
+      setUser(user)
+      toast.success('Login berhasil!', {
+        description: `Selamat datang kembali, ${displayName}`,
+      })
+
+      if (!token) {
+        toast.error('Login gagal', {
+          description: 'Token tidak ditemukan dari response login.',
+        })
+        return
+      }
+
+      try {
+        localStorage.setItem('auth_token', token)
+        router.push('/')
+        router.refresh()
+      } catch (error) {
+        toast.error('Login gagal', {
+          description:
+            error instanceof Error
+              ? error.message
+              : 'Terjadi kesalahan saat menyimpan token',
+        })
+      }
+    },
+    onError: (error: any) => {
+      toast.error('Login gagal', {
+        description: error instanceof Error ? error.message : 'Terjadi kesalahan saat login',
+      })
     },
   })
 
