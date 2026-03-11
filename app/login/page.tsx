@@ -10,20 +10,25 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Header with Logo */}
         <div className="p-4 flex items-center justify-center border-b bg-white">
           <div className="flex items-center gap-2">
-            <Star className="h-6 w-6 text-green-600 fill-green-600" />
-            <span className="text-xl font-bold text-gray-900">Santri App</span>
+            <Image
+              src="/logo.png"
+              alt="Santri App Logo"
+              width={32}
+              height={32}
+            />
+            <span className="text-xl font-bold text-gray-900">An-Nashriyyah</span>
           </div>
         </div>
 
         {/* Banner Image */}
         <div className="relative h-48 w-full bg-green-100">
           <Image
-            src="/placeholder.jpg"
+            src="/hero-section.png"
             alt="Pesantren Building"
             fill
             className="object-cover"
@@ -47,7 +52,7 @@ export default function LoginPage() {
               </div>
             </div>
           </div>
-
+          {process.env.NEXT_PUBLIC_URL_API}pp
           {/* Login Form */}
           <LoginForm />
         </div>

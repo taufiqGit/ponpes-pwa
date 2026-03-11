@@ -1,5 +1,5 @@
 // Service Worker for offline support
-const CACHE_NAME = 'notes-app-v1'
+const CACHE_NAME = 'notes-app-v2'
 const URLS_TO_CACHE = [
   '/',
   '/manifest.json',
@@ -39,6 +39,16 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (event.request.method !== 'GET') {
+    return
+  }
+
+  const url = new URL(event.request.url)
+  const isNextAsset = url.pathname.startsWith('/_next/')
+  const isApi = url.pathname.startsWith('/api/')
+  const accept = event.request.headers.get('accept') || ''
+  const isNavigation = accept.includes('text/html')
+
+  if (isNextAsset || isApi || isNavigation) {
     return
   }
 

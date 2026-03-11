@@ -1,5 +1,14 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
+
+vi.mock('@/lib/axios', () => ({
+  axiosInstance: {
+    post: vi.fn(),
+  },
+}))
+
+import { axiosInstance } from '@/lib/axios'
 import { LoginForm } from '@/components/login-form'
 
 // Mock useRouter
@@ -10,8 +19,20 @@ vi.mock('next/navigation', () => ({
   }),
 }))
 
-// Mock fetch
-global.fetch = vi.fn()
+function renderLoginForm() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  })
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <LoginForm />
+    </QueryClientProvider>,
+  )
+}
 
 describe('LoginForm', () => {
   beforeEach(() => {
@@ -19,7 +40,7 @@ describe('LoginForm', () => {
   })
 
   it('renders login form correctly', () => {
-    render(<LoginForm />)
+    renderLoginForm()
     
     expect(screen.getByPlaceholderText(/santri@pesantren.com/i)).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/••••••••/i)).toBeInTheDocument()
@@ -27,7 +48,7 @@ describe('LoginForm', () => {
   })
 
   it('shows validation errors when submitting empty form', async () => {
-    render(<LoginForm />)
+    renderLoginForm()
     
     fireEvent.click(screen.getByRole('button', { name: /Masuk ke Portal/i }))
     
@@ -38,12 +59,15 @@ describe('LoginForm', () => {
   })
 
   it('submits form correctly on valid input', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ user: { name: 'Test User' } }),
+    ;(axiosInstance.post as any).mockResolvedValueOnce({
+      data: {
+        success: true,
+        user: { id: '1', name: 'Test User', email: 'test@example.com', role: 'student' },
+        token: 'token',
+      },
     })
 
-    render(<LoginForm />)
+    renderLoginForm()
     
     fireEvent.change(screen.getByPlaceholderText(/santri@pesantren.com/i), {
       target: { value: 'test@example.com' },
@@ -55,24 +79,17 @@ describe('LoginForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /Masuk ke Portal/i }))
     
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/auth/login', expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({
-          identifier: 'test@example.com',
-          password: 'password123',
-          rememberMe: false,
-        }),
-      }))
+      expect(axiosInstance.post).toHaveBeenCalledWith('/api/auth/login', {
+        identifier: 'test@example.com',
+        password: 'password123',
+      })
     })
   })
 
   it('shows error message on failed login', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({ message: 'Identitas atau password salah' }),
-    })
+    ;(axiosInstance.post as any).mockRejectedValueOnce(new Error('Login gagal'))
 
-    render(<LoginForm />)
+    renderLoginForm()
     
     fireEvent.change(screen.getByPlaceholderText(/santri@pesantren.com/i), {
       target: { value: 'wrong@example.com' },
@@ -84,7 +101,7 @@ describe('LoginForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /Masuk ke Portal/i }))
     
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalled()
+      expect(axiosInstance.post).toHaveBeenCalled()
     })
   })
 })

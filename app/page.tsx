@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { ReactQueryDemo } from '@/components/react-query-demo'
 
 type Student = {
   id: string
@@ -244,6 +245,8 @@ export default function Page() {
               ))}
             </div>
           </section>
+
+          <ReactQueryDemo />
         </div>
       </div>
 

@@ -11,7 +11,8 @@ export async function POST(request: Request) {
     // Simple mock validation
     // Allow login if password is "password123" and identifier is valid
     if (password === 'password123') {
-      return NextResponse.json({
+      const token = 'mock-jwt-token-xyz-123'
+      const res = NextResponse.json({
         success: true,
         user: {
           id: '1',
@@ -19,8 +20,16 @@ export async function POST(request: Request) {
           email: identifier.includes('@') ? identifier : `${identifier}@example.com`,
           role: 'student',
         },
-        token: 'mock-jwt-token-xyz-123',
+        token,
       });
+      res.cookies.set('auth_token', token, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+      })
+      return res;
     }
 
     return NextResponse.json(

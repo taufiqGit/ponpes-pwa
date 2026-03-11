@@ -19,6 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { useLogin } from '@/api/auth'
 
 const loginSchema = z.object({
   identifier: z.string().min(1, 'Email atau No. Handphone wajib diisi'),
@@ -30,8 +31,28 @@ type LoginFormValues = z.infer<typeof loginSchema>
 
 export function LoginForm() {
   const router = useRouter()
-  const [isLoading, setIsLoading] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
+  const { mutate: login, isPending } = useLogin({
+    onSuccess: (data) => {
+      toast.success('Login berhasil!', {
+        description: `Selamat datang kembali, ${data?.user?.name ?? 'o'}`,
+      })
+      console.log(data, 'ans')
+      if (false) {
+        // In a real app, this might set a persistent cookie or token
+        localStorage.setItem('rememberMe', 'true')
+      }
+
+      // Redirect to dashboard/home
+      router.push('/')
+      router.refresh()
+    },
+    onError: (error: any) => {
+      toast.error('Login gagal', {
+        description: error instanceof Error ? error.message : 'Terjadi kesalahan saat login',
+      })
+    },
+  })
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -43,42 +64,7 @@ export function LoginForm() {
   })
 
   async function onSubmit(data: LoginFormValues) {
-    setIsLoading(true)
-
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Gagal login')
-      }
-
-      toast.success('Login berhasil!', {
-        description: `Selamat datang kembali, ${result.user.name}`,
-      })
-
-      if (data.rememberMe) {
-        // In a real app, this might set a persistent cookie or token
-        localStorage.setItem('rememberMe', 'true')
-      }
-
-      // Redirect to dashboard/home
-      router.push('/')
-      router.refresh()
-    } catch (error) {
-      toast.error('Login gagal', {
-        description: error instanceof Error ? error.message : 'Terjadi kesalahan saat login',
-      })
-    } finally {
-      setIsLoading(false)
-    }
+    login({ identifier: data.identifier, usr_password: data.password })
   }
 
   return (
@@ -90,15 +76,15 @@ export function LoginForm() {
             name="identifier"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email atau No. Handphone</FormLabel>
+                <FormLabel className="text-gray-900">Email atau No. Handphone</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="santri@pesantren.com"
-                      className="pl-9"
+                      className="pl-9 bg-card bg-white dark:bg-white text-black placeholder:text-muted-foreground"
                       {...field}
-                      disabled={isLoading}
+                      disabled={isPending}
                     />
                   </div>
                 </FormControl>
@@ -113,7 +99,7 @@ export function LoginForm() {
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center justify-between">
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="text-gray-900">Password</FormLabel>
                   <a
                     href="#"
                     className="text-sm font-medium text-green-600 hover:text-green-500 hover:underline"
@@ -131,9 +117,9 @@ export function LoginForm() {
                     <Input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
-                      className="pl-9 pr-9"
+                      className="pl-9 pr-9 bg-card bg-white dark:bg-white text-black placeholder:text-muted-foreground"
                       {...field}
-                      disabled={isLoading}
+                      disabled={isPending}
                     />
                     <Button
                       type="button"
@@ -141,7 +127,7 @@ export function LoginForm() {
                       size="sm"
                       className="absolute right-0 top-0 h-9 w-9 px-0 hover:bg-transparent"
                       onClick={() => setShowPassword(!showPassword)}
-                      disabled={isLoading}
+                      disabled={isPending}
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -166,11 +152,11 @@ export function LoginForm() {
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    disabled={isLoading}
+                    disabled={isPending}
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
-                  <FormLabel>
+                  <FormLabel className="text-gray-900">
                     Ingat saya
                   </FormLabel>
                 </div>
@@ -182,9 +168,9 @@ export function LoginForm() {
         <Button
           type="submit"
           className="w-full bg-green-700 hover:bg-green-800 text-white"
-          disabled={isLoading}
+          disabled={isPending}
         >
-          {isLoading ? (
+          {isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Memproses...

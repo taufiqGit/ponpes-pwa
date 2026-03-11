@@ -1,10 +1,26 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 import Page from '@/app/page'
 
+function renderPage() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  })
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <Page />
+    </QueryClientProvider>,
+  )
+}
+
 describe('Homepage Santri App', () => {
   it('menampilkan elemen utama sesuai desain', () => {
-    render(<Page />)
+    renderPage()
 
     expect(screen.getByText(/portal orang tua/i)).toBeInTheDocument()
     expect(screen.getByText(/assalamu'alaikum/i)).toBeInTheDocument()
@@ -14,7 +30,7 @@ describe('Homepage Santri App', () => {
   })
 
   it('mengubah santri aktif saat memilih dari daftar', () => {
-    render(<Page />)
+    renderPage()
 
     fireEvent.click(screen.getByRole('button', { name: /muhammad zaidan/i }))
     fireEvent.click(screen.getByRole('button', { name: /siti fatimah/i }))
@@ -23,7 +39,7 @@ describe('Homepage Santri App', () => {
   })
 
   it('memindahkan status menu aktif di bottom navigation', () => {
-    render(<Page />)
+    renderPage()
 
     const pembayaran = screen.getByTestId('nav-pembayaran')
     fireEvent.click(pembayaran)

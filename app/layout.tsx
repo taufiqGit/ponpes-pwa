@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/sonner'
 import { SWRegister } from '@/components/sw-register'
+import { QueryProvider } from '@/components/query-provider'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -53,10 +54,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <SWRegister />
-          {children}
-          <Toaster />
-          <Analytics />
+          <QueryProvider>
+            <SWRegister />
+            {children}
+            <Toaster />
+            <Analytics />
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

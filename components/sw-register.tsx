@@ -4,7 +4,11 @@ import { useEffect } from 'react'
 
 export function SWRegister() {
   useEffect(() => {
-    if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+    if (
+      process.env.NODE_ENV === 'production' &&
+      'serviceWorker' in navigator &&
+      (window.location.protocol === 'https:' || window.location.hostname === 'localhost')
+    ) {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
