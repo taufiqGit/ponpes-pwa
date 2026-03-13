@@ -15,6 +15,28 @@ vi.mock('@/api/auth', () => ({
   }),
 }))
 
+vi.mock('@/api/santri', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/api/santri')>()
+  return {
+    ...actual,
+    useTagihanCheckLunas: () => ({
+      data: {
+        code: 200,
+        status: true,
+        messages: 'OK',
+        data: {
+          sytg_santri_id: 214,
+          sytg_bulan: 3,
+          sytg_tahun: 2025,
+          is_lunas: true,
+        },
+      },
+      isLoading: false,
+      isError: false,
+    }),
+  }
+})
+
 function renderPage() {
   localStorage.setItem('auth_token', 'test-token')
   const queryClient = new QueryClient({
@@ -38,8 +60,6 @@ describe('Homepage Santri App', () => {
     expect(screen.getByText(/portal orang tua/i)).toBeInTheDocument()
     expect(screen.getByText(/assalamu'alaikum/i)).toBeInTheDocument()
     expect(screen.getByText(/status spp/i)).toBeInTheDocument()
-    expect(screen.getByText(/menu cepat/i)).toBeInTheDocument()
-    expect(screen.getByText(/jadwal hari ini/i)).toBeInTheDocument()
   })
 
   it('mengubah santri aktif saat memilih dari daftar', () => {

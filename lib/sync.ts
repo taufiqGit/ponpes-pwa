@@ -8,7 +8,7 @@ export async function syncWithServer(): Promise<void> {
   return Promise.resolve()
 }
 
-export function setupSyncListener(): void {
+export function setupSyncListener(): (() => void) | void {
   // Setup for future cloud sync integration if needed
   // Currently using IndexedDB for local persistence
   

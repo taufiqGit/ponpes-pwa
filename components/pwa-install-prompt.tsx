@@ -64,17 +64,17 @@ export function PWAInstallPrompt() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 bg-card border border-border rounded-lg shadow-lg p-4 max-w-sm animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed bottom-4 right-4 z-50 max-w-sm animate-in slide-in-from-bottom-4 rounded-lg border border-[#2a8b3e] bg-[#2a8b3e] p-4 text-white shadow-lg duration-300">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <h3 className="font-semibold text-sm mb-1">Install An-Nashriyyah App</h3>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-white/85">
             Install An-Nashriyyah to your home screen for quick access
           </p>
         </div>
         <button
           onClick={handleDismiss}
-          className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
+          className="flex-shrink-0 text-white/85 transition-colors hover:text-white"
         >
           <X className="w-4 h-4" />
         </button>
@@ -84,14 +84,14 @@ export function PWAInstallPrompt() {
           variant="outline"
           size="sm"
           onClick={handleDismiss}
-          className="flex-1"
+          className="flex-1 border-white/80 bg-transparent text-white hover:bg-white/10 hover:text-white"
         >
           Later
         </Button>
         <Button
           size="sm"
           onClick={handleInstall}
-          className="flex-1 gap-2"
+          className="flex-1 gap-2 bg-white text-[#2a8b3e] hover:bg-white/90"
         >
           <Download className="w-3 h-3" />
           Install

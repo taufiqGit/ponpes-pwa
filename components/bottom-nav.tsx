@@ -6,15 +6,16 @@ import { BookOpen, Megaphone, Star, UserRound, Wallet } from 'lucide-react'
 type NavItem = {
   key: string
   label: string
+  route: string
   icon: React.ComponentType<{ className?: string }>
 }
 
 export const navItems: NavItem[] = [
-  { key: 'beranda', label: 'Beranda', icon: Star },
-  { key: 'penilaian-kategori', label: 'Penilaian Kategori', icon: Wallet },
-  { key: 'penilaian-kitab', label: 'Penilaian Kitab', icon: BookOpen },
-  { key: 'riwayat-pembayaran', label: 'Riwayat Pembayaran', icon: Megaphone },
-  { key: 'profil', label: 'Profil', icon: UserRound },
+  { key: 'beranda', route: '/', label: 'Beranda', icon: Star },
+  { key: 'penilaian-kategori', route: '/penilaian-kategori', label: 'Penilaian Kategori', icon: Wallet },
+  { key: 'penilaian-kitab', route: '/penilaian-kitab', label: 'Penilaian Kitab', icon: BookOpen },
+  { key: 'riwayat-pembayaran', route: '/riwayat-pembayaran', label: 'Riwayat Pembayaran', icon: Megaphone },
+  { key: 'profil', route: '/profil', label: 'Profil', icon: UserRound },
 ]
 
 type Props = {

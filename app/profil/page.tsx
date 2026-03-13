@@ -119,16 +119,16 @@ export default function ProfilPage() {
                   </div>
                   <div>
                     <p className="text-sm font-bold text-[#0f2147]">{s?.nama ?? '-'}</p>
-                    <p className="text-xs font-semibold text-[#7b8db0]">{s?.kelas ?? 'Kelas -'}</p>
+                    <p className="text-xs font-semibold text-[#7b8db0]">{s?.tingkat_kelas ? `Kelas ${s?.tingkat_kelas}` : 'Kelas -'}</p>
                   </div>
                 </div>
                 <ChevronRight className="h-5 w-5 text-[#9db3a4]" />
               </button>
             ))}
           </section>
-
-          <p className="mb-2 text-xs font-bold tracking-widest text-[#7aa485]">PENGATURAN APLIKASI</p>
-          <section className="space-y-2 rounded-2xl bg-white p-2 shadow-sm ring-1 ring-[#e6eee8]">
+{/* 
+          <p className="mb-2 text-xs font-bold tracking-widest text-[#7aa485]">PENGATURAN APLIKASI</p> */}
+          {/* <section className="space-y-2 rounded-2xl bg-white p-2 shadow-sm ring-1 ring-[#e6eee8]">
             <div className="flex items-center justify-between rounded-xl px-4 py-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#eef6f0] text-[#2a8b3e]">
@@ -154,7 +154,7 @@ export default function ProfilPage() {
               </div>
               <ChevronRight className="h-5 w-5 text-[#9db3a4]" />
             </button>
-          </section>
+          </section> */}
 
           <div className="mt-6">
             <button
@@ -167,7 +167,7 @@ export default function ProfilPage() {
           </div>
 
           <p className="mt-6 text-center text-[11px] font-semibold tracking-wide text-[#95a6c5]">
-            SANTRI APP V2.4.0 (BUILD 102)
+            Santri App V0.1.0
           </p>
         </div>
 

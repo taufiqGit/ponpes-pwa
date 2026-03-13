@@ -23,7 +23,7 @@ interface NoteDB extends DBSchema {
   notes: {
     key: string
     value: Note
-    indexes: { 'by-date': number; 'by-synced': boolean }
+    indexes: { 'by-date': number }
   }
   syncQueue: {
     key: string
@@ -43,7 +43,6 @@ export async function initDB(): Promise<IDBPDatabase<NoteDB>> {
       if (!db.objectStoreNames.contains('notes')) {
         const notesStore = db.createObjectStore('notes', { keyPath: 'id' })
         notesStore.createIndex('by-date', 'updatedAt')
-        notesStore.createIndex('by-synced', 'synced')
       }
 
       // Sync queue store

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Bell,
   BookOpen,
@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { ReactQueryDemo } from '@/components/react-query-demo'
 import { useAuthStore } from '@/store/auth'
 import { useAccountMe } from '@/api/auth'
+import { useTagihanCheckLunas } from '@/api/santri'
 import { RequireAuth } from '@/components/auth-guard'
 import { BottomNav } from '@/components/bottom-nav'
 
@@ -68,12 +69,64 @@ const quickMenus = [
 
 export default function Page() {
   const account: any = useAccountMe().data
-  const { user } = useAuthStore()
+  const user = useAuthStore((state) => state.user)
+  const selectedStudentId = useAuthStore((state) => state.selectedStudentId)
+  const setSelectedStudentId = useAuthStore((state) => state.setSelectedStudentId)
   const [isStudentPickerOpen, setIsStudentPickerOpen] = useState(false)
   const [activeNav, setActiveNav] = useState('beranda')
 
-  const [selectedStudentId, setSelectedStudentId] = useState(account?.santri_ids?.[0]?.id)
-  console.log(account, 'jepara')
+  const { bulan, tahun } = useMemo(() => {
+    const now = new Date()
+    return { bulan: now.getMonth() + 1, tahun: now.getFullYear() }
+  }, [])
+
+  const sppParams = useMemo(
+    () =>
+      selectedStudentId
+        ? {
+            sytg_santri_id: selectedStudentId,
+            sytg_bulan: bulan,
+            sytg_tahun: tahun,
+          }
+        : undefined,
+    [bulan, selectedStudentId, tahun],
+  )
+
+  const spp = useTagihanCheckLunas(sppParams)
+  const isSppLunas = Boolean(spp.data?.data?.is_lunas)
+
+  const bulanTahunLabel = useMemo(() => {
+    const bulanNama = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ][Math.max(1, Math.min(12, bulan)) - 1]
+
+    return `${bulanNama} ${tahun}`
+  }, [bulan, tahun])
+
+  useEffect(() => {
+    const firstId = account?.santri_ids?.[0]?.id
+    if (!firstId) return
+
+    if (!selectedStudentId) {
+      setSelectedStudentId(firstId)
+      return
+    }
+
+    const exists = Boolean(account?.santri_ids?.some((s: any) => s?.id === selectedStudentId))
+    if (!exists) setSelectedStudentId(firstId)
+  }, [account?.santri_ids, selectedStudentId, setSelectedStudentId])
+
   const selectedStudent = useMemo(
     () =>
       account?.santri_ids?.find((student: any) => student.id === selectedStudentId) ??
@@ -152,7 +205,7 @@ export default function Page() {
                         setIsStudentPickerOpen(false)
                         toast.success(`Santri aktif: ${student.nama}`)
                       }}
-                    >{JSON.stringify(selectedStudentId)}
+                    >
                       <span className="text-sm">{student.nama}</span>
                     </button>
                   ))}
@@ -161,13 +214,30 @@ export default function Page() {
             </div>
           </section>
 
-          <section className="rounded-3xl bg-[#eef7ef] p-5 shadow-sm ring-1 ring-[#cfe3d3]">
-            <div className="mb-3 flex items-center gap-2 text-[#2a8b3e]">
+          <section
+            className={`rounded-3xl p-5 shadow-sm ring-1 ${
+              isSppLunas ? 'bg-[#eef7ef] ring-[#cfe3d3]' : 'bg-[#fff3e6] ring-[#f0d9bd]'
+            }`}
+          >
+            <div className={`mb-3 flex items-center gap-2 ${isSppLunas ? 'text-[#2a8b3e]' : 'text-[#b45309]'}`}>
               <Wallet className="h-6 w-6" />
               <p className="text-md font-bold tracking-wide">STATUS SPP</p>
             </div>
-            <p className="text-md font-extrabold text-[#0d1e45]">Lunas</p>
-            <p className="mt-2 text-base font-medium text-[#6a7b9f]">Bulan: Januari 2024</p>
+            <p className="text-md font-extrabold text-[#0d1e45]">
+              {!selectedStudentId
+                ? 'Pilih santri'
+                : spp.isLoading
+                  ? 'Memuat...'
+                  : spp.isError
+                    ? 'Gagal memuat'
+                    : isSppLunas
+                      ? 'Lunas'
+                      : 'Belum Lunas'}
+            </p>
+            <p className="mt-2 text-base font-medium text-[#6a7b9f]">Bulan: {bulanTahunLabel}</p>
+            {!spp.isLoading && !spp.isError && !isSppLunas && spp.data?.messages ? (
+              <p className="mt-1 text-sm font-semibold text-[#8a6b3f]">{spp.data.messages}</p>
+            ) : null}
           </section>
 
           {/* <section className="rounded-3xl bg-[#16823a] px-5 py-4 text-white shadow-lg shadow-green-900/15">
@@ -184,7 +254,7 @@ export default function Page() {
             </div>
           </section> */}
 
-          <section className="space-y-4">
+          {/* <section className="space-y-4">
             <p className="text-lg font-extrabold tracking-[0.08em] text-[#7488ad]">Menu Cepat</p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {quickMenus.map((menu) => {
@@ -204,9 +274,9 @@ export default function Page() {
                 )
               })}
             </div>
-          </section>
+          </section> */}
 
-          <section className="space-y-3">
+          {/* <section className="space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-lg font-extrabold tracking-[0.08em] text-[#7488ad]">Jadwal Hari Ini</p>
               <button
@@ -217,7 +287,7 @@ export default function Page() {
                 Lihat Semua
               </button>
             </div>
-          </section>
+          </section> */}
 
           {/* <ReactQueryDemo /> */}
         </div>
