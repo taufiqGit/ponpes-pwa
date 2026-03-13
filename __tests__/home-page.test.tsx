@@ -37,6 +37,41 @@ vi.mock('@/api/santri', async (importOriginal) => {
   }
 })
 
+vi.mock('@/api/pengumuman', () => ({
+  usePengumuman: () => ({
+    data: {
+      code: 200,
+      status: true,
+      messages: 'Data pengumuman berhasil diambil',
+      data: {
+        items: [
+          {
+            id: 1,
+            title: 'Pengumuman Test',
+            body: 'Body',
+            duration: 10,
+            start_date: null,
+            image_url: null,
+            created_at: null,
+            updated_at: null,
+            created_by: null,
+          },
+        ],
+        pagination: {
+          total: 1,
+          page: 1,
+          limit: 1,
+          total_pages: 1,
+          has_next: false,
+          has_prev: false,
+        },
+      },
+    },
+    isLoading: false,
+    isError: false,
+  }),
+}))
+
 function renderPage() {
   localStorage.setItem('auth_token', 'test-token')
   const queryClient = new QueryClient({

@@ -14,6 +14,7 @@ export default function ProfilPage() {
 
   const onLogout = () => {
     localStorage.removeItem('auth_token')
+    localStorage.removeItem('auth')
     window.location.href = '/login'
   }
 

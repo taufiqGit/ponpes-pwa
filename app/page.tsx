@@ -18,6 +18,7 @@ import { ReactQueryDemo } from '@/components/react-query-demo'
 import { useAuthStore } from '@/store/auth'
 import { useAccountMe } from '@/api/auth'
 import { useTagihanCheckLunas } from '@/api/santri'
+import { usePengumuman } from '@/api/pengumuman'
 import { RequireAuth } from '@/components/auth-guard'
 import { BottomNav } from '@/components/bottom-nav'
 
@@ -84,16 +85,19 @@ export default function Page() {
     () =>
       selectedStudentId
         ? {
-            sytg_santri_id: selectedStudentId,
-            sytg_bulan: bulan,
-            sytg_tahun: tahun,
-          }
+          sytg_santri_id: selectedStudentId,
+          sytg_bulan: bulan,
+          sytg_tahun: tahun,
+        }
         : undefined,
     [bulan, selectedStudentId, tahun],
   )
 
   const spp = useTagihanCheckLunas(sppParams)
   const isSppLunas = Boolean(spp.data?.data?.is_lunas)
+
+  const pengumuman = usePengumuman({ page: 1, limit: 100 })
+  const pengumumanItems = pengumuman.data?.data?.items ?? []
 
   const bulanTahunLabel = useMemo(() => {
     const bulanNama = [
@@ -136,125 +140,196 @@ export default function Page() {
 
   return (
     <RequireAuth>
-    <main className="min-h-screen bg-[#f7faf7] text-[#0e1b3b]">
-      <div className="mx-auto w-full max-w-6xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
-        <div className="mx-auto max-w-3xl space-y-5 md:space-y-6">
-          <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#e6eee8] md:p-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#ffd9b8] text-[#2a8b3e]">
-                  <UserRound className="h-6 w-6" />
+      <main className="min-h-screen bg-[#f7faf7] text-[#0e1b3b]">
+        <div className="mx-auto w-full max-w-6xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
+          <div className="mx-auto max-w-3xl space-y-5 md:space-y-6">
+            <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#e6eee8] md:p-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#ffd9b8] text-[#2a8b3e]">
+                    <UserRound className="h-6 w-6" />
+                  </div>
+                  <div className="leading-tight">
+                    <p className="text-sm font-semibold text-[#6b7c9f]">Portal Orang Tua</p>
+                    <p className="text-xl font-extrabold text-[#2a8b3e]">{account?.usr_full_name}</p>
+                  </div>
                 </div>
-                <div className="leading-tight">
-                  <p className="text-sm font-semibold text-[#6b7c9f]">Portal Orang Tua</p>
-                  <p className="text-xl font-extrabold text-[#2a8b3e]">Annasriyah</p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full text-[#6b7c9f]"
-                onClick={() => toast.info('Belum ada notifikasi baru')}
-                aria-label="Lihat notifikasi"
-              >
-                <Bell className="h-5 w-5" />
-              </Button>
-            </div>
-          </section>
-
-          <section className="space-y-1">
-            <h1 className="text-xl font-extrabold leading-tight md:text-4xl">
-              Assalamu&apos;alaikum, <span className="text-[#2a8b3e]">Bapak/Ibu {account?.usr_full_name}</span>
-            </h1>
-            <p className="text-base text-[#5e7096] md:text-lg">
-              Selamat datang kembali di Pondok Annasriyah
-            </p>
-          </section>
-
-          <section className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-[#e6eee8] md:p-5">
-            <p className="text-md font-bold tracking-wide text-[#7b8db0]">Pilih Santri</p>
-            <div className="mt-3 space-y-2">
-              <button
-                type="button"
-                className="flex w-full items-center justify-between rounded-2xl bg-[#f6fbf7] px-5 py-4 text-left font-bold text-[#12244b] ring-1 ring-[#e4eee7] transition hover:bg-[#eff8f0]"
-                onClick={() => setIsStudentPickerOpen((prev) => !prev)}
-                aria-expanded={isStudentPickerOpen}
-                aria-controls="student-picker-list"
-              >
-                <span className="text-sm">{selectedStudent?.nama}</span>
-                <ChevronDown
-                  className={`h-6 w-6 text-[#2a8b3e] transition-transform ${isStudentPickerOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-              {isStudentPickerOpen && (
-                <div
-                  id="student-picker-list"
-                  className="rounded-2xl border border-[#ddebe0] bg-white p-2"
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full text-[#6b7c9f]"
+                  onClick={() => toast.info('Belum ada notifikasi baru')}
+                  aria-label="Lihat notifikasi"
                 >
-                  {account?.santri_ids?.map((student: any) => (
-                    <button
-                      key={student.id}
-                      type="button"
-                      className={`w-full rounded-xl px-3 py-2 text-left font-semibold transition ${
-                        student.id === selectedStudentId
-                          ? 'bg-[#2a8b3e] text-white'
-                          : 'text-[#23406f] hover:bg-[#f2f7f3]'
-                      }`}
-                      onClick={() => {
-                        setSelectedStudentId(student.id)
-                        setIsStudentPickerOpen(false)
-                        toast.success(`Santri aktif: ${student.nama}`)
-                      }}
-                    >
-                      <span className="text-sm">{student.nama}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </section>
-
-          <section
-            className={`rounded-3xl p-5 shadow-sm ring-1 ${
-              isSppLunas ? 'bg-[#eef7ef] ring-[#cfe3d3]' : 'bg-[#fff3e6] ring-[#f0d9bd]'
-            }`}
-          >
-            <div className={`mb-3 flex items-center gap-2 ${isSppLunas ? 'text-[#2a8b3e]' : 'text-[#b45309]'}`}>
-              <Wallet className="h-6 w-6" />
-              <p className="text-md font-bold tracking-wide">STATUS SPP</p>
-            </div>
-            <p className="text-md font-extrabold text-[#0d1e45]">
-              {!selectedStudentId
-                ? 'Pilih santri'
-                : spp.isLoading
-                  ? 'Memuat...'
-                  : spp.isError
-                    ? 'Gagal memuat'
-                    : isSppLunas
-                      ? 'Lunas'
-                      : 'Belum Lunas'}
-            </p>
-            <p className="mt-2 text-base font-medium text-[#6a7b9f]">Bulan: {bulanTahunLabel}</p>
-            {!spp.isLoading && !spp.isError && !isSppLunas && spp.data?.messages ? (
-              <p className="mt-1 text-sm font-semibold text-[#8a6b3f]">{spp.data.messages}</p>
-            ) : null}
-          </section>
-
-          {/* <section className="rounded-3xl bg-[#16823a] px-5 py-4 text-white shadow-lg shadow-green-900/15">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <span className="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
-                  Pengumuman Terbaru
-                </span>
-                <p className="mt-2 text-md font-extrabold leading-tight">
-                  Ujian Tengah Semester dimulai 15 Feb
-                </p>
+                  <Bell className="h-5 w-5" />
+                </Button>
               </div>
-              <Megaphone className="h-8 w-8 shrink-0" />
-            </div>
-          </section> */}
+            </section>
 
-          {/* <section className="space-y-4">
+            <section className="space-y-1">
+              <h1 className="text-xl font-extrabold leading-tight md:text-4xl">
+                Assalamu&apos;alaikum, <span className="text-[#2a8b3e]">Bapak/Ibu {account?.usr_full_name}</span>
+              </h1>
+              <p className="text-base text-[#5e7096] md:text-lg">
+                Selamat datang kembali di Pondok Annasriyah
+              </p>
+            </section>
+
+            <section className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-[#e6eee8] md:p-5">
+              <p className="text-md font-bold tracking-wide text-[#7b8db0]">Pilih Santri</p>
+              <div className="mt-3 space-y-2">
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between rounded-2xl bg-[#f6fbf7] px-5 py-4 text-left font-bold text-[#12244b] ring-1 ring-[#e4eee7] transition hover:bg-[#eff8f0]"
+                  onClick={() => setIsStudentPickerOpen((prev) => !prev)}
+                  aria-expanded={isStudentPickerOpen}
+                  aria-controls="student-picker-list"
+                >
+                  <span className="text-sm">{selectedStudent?.nama}</span>
+                  <ChevronDown
+                    className={`h-6 w-6 text-[#2a8b3e] transition-transform ${isStudentPickerOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {isStudentPickerOpen && (
+                  <div
+                    id="student-picker-list"
+                    className="rounded-2xl border border-[#ddebe0] bg-white p-2"
+                  >
+                    {account?.santri_ids?.map((student: any) => (
+                      <button
+                        key={student.id}
+                        type="button"
+                        className={`w-full rounded-xl px-3 py-2 text-left font-semibold transition ${student.id === selectedStudentId
+                            ? 'bg-[#2a8b3e] text-white'
+                            : 'text-[#23406f] hover:bg-[#f2f7f3]'
+                          }`}
+                        onClick={() => {
+                          setSelectedStudentId(student.id)
+                          setIsStudentPickerOpen(false)
+                          toast.success(`Santri aktif: ${student.nama}`)
+                        }}
+                      >
+                        <span className="text-sm">{student.nama}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </section>
+
+            <section
+              className={`rounded-3xl p-5 shadow-sm ring-1 ${isSppLunas ? 'bg-[#eef7ef] ring-[#cfe3d3]' : 'bg-[#fff3e6] ring-[#f0d9bd]'
+                }`}
+            >
+              <div className={`mb-3 flex items-center gap-2 ${isSppLunas ? 'text-[#2a8b3e]' : 'text-[#b45309]'}`}>
+                <Wallet className="h-6 w-6" />
+                <p className="text-md font-bold tracking-wide">STATUS SPP</p>
+              </div>
+              <p className="text-md font-extrabold text-[#0d1e45]">
+                {!selectedStudentId
+                  ? 'Pilih santri'
+                  : spp.isLoading
+                    ? 'Memuat...'
+                    : spp.isError
+                      ? 'Gagal memuat'
+                      : isSppLunas
+                        ? 'Lunas'
+                        : 'Belum Lunas'}
+              </p>
+              <p className="mt-2 text-base font-medium text-[#6a7b9f]">Bulan: {bulanTahunLabel}</p>
+              {!spp.isLoading && !spp.isError && !isSppLunas && spp.data?.messages ? (
+                <p className="mt-1 text-sm font-semibold text-[#8a6b3f]">{spp.data.messages}</p>
+              ) : null}
+            </section>
+
+            <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1b8f3f] via-[#16823a] to-[#0f6a2e] px-5 py-4 text-white shadow-lg shadow-green-900/15 ring-1 ring-white/10">
+              <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-white/10 blur-2xl" />
+              <div className="pointer-events-none absolute -bottom-16 -left-16 h-44 w-44 rounded-full bg-black/10 blur-2xl" />
+
+              <div className="relative flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-bold tracking-wide">
+                      Pengumuman Terbaru
+                    </span>
+                    {pengumumanItems.length > 0 && !pengumuman.isLoading && !pengumuman.isError ? (
+                      <span className="inline-flex rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-extrabold text-white/90 ring-1 ring-white/10">
+                        {Math.min(3, pengumumanItems.length)} Info
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {pengumuman.isLoading ? (
+                    <div className="mt-3 space-y-2">
+                      <div className="h-4 w-4/5 rounded-full bg-white/20" />
+                      <div className="h-3 w-3/5 rounded-full bg-white/15" />
+                    </div>
+                  ) : pengumuman.isError ? (
+                    <p className="mt-3 text-sm font-extrabold leading-snug text-white">
+                      Gagal memuat pengumuman
+                    </p>
+                  ) : pengumumanItems.length === 0 ? (
+                    <p className="mt-3 text-sm font-extrabold leading-snug text-white">
+                      Belum ada pengumuman
+                    </p>
+                  ) : (
+                    <div className="mt-3 space-y-2">
+                      {pengumumanItems.slice(0, 3).map((item) => {
+                        const rawDate = item.start_date
+                        const parsed = rawDate ? Date.parse(rawDate) : NaN
+                        const dateLabel = Number.isFinite(parsed)
+                          ? new Date(parsed).toLocaleDateString('id-ID', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                            })
+                          : null
+
+                        return (
+                          <a
+                            key={item.id}
+                            href={`/pengumuman/${item.id}`}
+                            className="group flex gap-3 rounded-2xl bg-white/10 px-3 py-2.5 ring-1 ring-white/10 backdrop-blur-sm transition hover:bg-white/15"
+                          >
+                            <div className="mt-1.5 h-2.5 w-2.5 flex-none rounded-full bg-white/80 shadow-sm shadow-black/10" />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="min-w-0 flex-1 text-sm font-extrabold leading-snug text-white">
+                                  {item.title ?? item.body ?? '-'}
+                                </p>
+                                {dateLabel ? (
+                                  <span className="flex-none rounded-full bg-white/10 px-2 py-1 text-[11px] font-bold text-white/85 ring-1 ring-white/10">
+                                    {dateLabel}
+                                  </span>
+                                ) : null}
+                              </div>
+                              {item.body ? (
+                                <p
+                                  className="mt-1 text-xs font-semibold text-white/85"
+                                  style={{
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden',
+                                  }}
+                                >
+                                  {item.body}
+                                </p>
+                              ) : null}
+                            </div>
+                          </a>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/10">
+                  <Megaphone className="h-6 w-6" />
+                </div>
+              </div>
+            </section>
+
+            {/* <section className="space-y-4">
             <p className="text-lg font-extrabold tracking-[0.08em] text-[#7488ad]">Menu Cepat</p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {quickMenus.map((menu) => {
@@ -276,7 +351,7 @@ export default function Page() {
             </div>
           </section> */}
 
-          {/* <section className="space-y-3">
+            {/* <section className="space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-lg font-extrabold tracking-[0.08em] text-[#7488ad]">Jadwal Hari Ini</p>
               <button
@@ -289,21 +364,21 @@ export default function Page() {
             </div>
           </section> */}
 
-          {/* <ReactQueryDemo /> */}
+            {/* <ReactQueryDemo /> */}
+          </div>
         </div>
-      </div>
 
-      <BottomNav active={activeNav} onChange={setActiveNav} />
+        <BottomNav active={activeNav} onChange={setActiveNav} />
 
-      <button
-        type="button"
-        className="fixed bottom-24 right-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#2a8b3e] text-white shadow-lg md:bottom-8 md:right-8"
-        onClick={() => toast.info('Kalender kegiatan dibuka')}
-        aria-label="Buka kalender"
-      >
-        <CalendarDays className="h-6 w-6" />
-      </button>
-    </main>
+        <button
+          type="button"
+          className="fixed bottom-24 right-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#2a8b3e] text-white shadow-lg md:bottom-8 md:right-8"
+          onClick={() => toast.info('Kalender kegiatan dibuka')}
+          aria-label="Buka kalender"
+        >
+          <CalendarDays className="h-6 w-6" />
+        </button>
+      </main>
     </RequireAuth>
   )
 }
