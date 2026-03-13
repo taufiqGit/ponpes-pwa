@@ -147,7 +147,7 @@ export default function Page() {
                 </div>
                 <div className="leading-tight">
                   <p className="text-sm font-semibold text-[#6b7c9f]">Portal Orang Tua</p>
-                  <p className="text-xl font-extrabold text-[#2a8b3e]">Annasriyah</p>
+                  <p className="text-xl font-extrabold text-[#2a8b3e]">{account?.usr_full_name}</p>
                 </div>
               </div>
               <Button

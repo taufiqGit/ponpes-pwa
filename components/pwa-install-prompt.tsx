@@ -69,7 +69,7 @@ export function PWAInstallPrompt() {
         <div className="flex-1">
           <h3 className="font-semibold text-sm mb-1">Install An-Nashriyyah App</h3>
           <p className="text-xs text-white/85">
-            Install An-Nashriyyah to your home screen for quick access
+            Pasang An-Nashriyyah di layar utama untuk akses cepat
           </p>
         </div>
         <button
@@ -86,7 +86,7 @@ export function PWAInstallPrompt() {
           onClick={handleDismiss}
           className="flex-1 border-white/80 bg-transparent text-white hover:bg-white/10 hover:text-white"
         >
-          Later
+          Nanti
         </Button>
         <Button
           size="sm"
