@@ -244,9 +244,9 @@ export default function Page() {
                     <p className="mt-1 text-sm font-semibold text-[#6b7c9f]">
                       {asramaData?.asrama?.asr_kode ?? '-'} • {asramaData?.asrama?.asr_jenis_display ?? '-'}
                     </p>
-                    <p className="mt-1 text-xs font-semibold text-[#6b7c9f]">
+                    {/* <p className="mt-1 text-xs font-semibold text-[#6b7c9f]">
                       Lantai: {asramaData?.asrama?.asr_lantai ?? '-'} • Kapasitas: {asramaData?.asrama?.total_kapasitas ?? '-'}
-                    </p>
+                    </p> */}
                   </div>
 
                   <div className="grid grid-cols-1 gap-2 text-sm font-semibold text-[#23406f] sm:grid-cols-2">
@@ -270,7 +270,7 @@ export default function Page() {
                 <p className="mt-2 text-sm font-medium text-[#6a7b9f]">{asramaInfo.data.messages}</p>
               ) : null}
             </section>
-            
+
             <section
               className={`rounded-3xl p-5 shadow-sm ring-1 ${isSppLunas ? 'bg-[#eef7ef] ring-[#cfe3d3]' : 'bg-[#fff3e6] ring-[#f0d9bd]'
                 }`}
