@@ -106,7 +106,7 @@ export default function PenilaianKitabPage() {
                           {row.kitab_kode ?? 'KITAB'}
                         </p>
                         <p className="mt-1 text-base font-extrabold text-[#0f2147]">
-                          {row.kitab_nama ?? '-'}ss
+                          {row.kitab_nama ?? '-'}
                         </p>
                         <p className="mt-1 text-sm font-semibold text-[#6b7c9f]">
                           {row?.kode_penilaian ? `${row?.kode_penilaian}` : ''}
