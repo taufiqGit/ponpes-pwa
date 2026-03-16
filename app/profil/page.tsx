@@ -123,7 +123,7 @@ export default function ProfilPage() {
                     <p className="text-xs font-semibold text-[#7b8db0]">{s?.tingkat_kelas ? `Kelas ${s?.tingkat_kelas}` : 'Kelas -'}</p>
                   </div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-[#9db3a4]" />
+                {/* <ChevronRight className="h-5 w-5 text-[#9db3a4]" /> */}
               </button>
             ))}
           </section>

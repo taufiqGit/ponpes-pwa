@@ -6,6 +6,7 @@ import {
   BookOpen,
   CalendarDays,
   ChevronDown,
+  House,
   EllipsisVertical,
   Megaphone,
   Star,
@@ -17,7 +18,7 @@ import { Button } from '@/components/ui/button'
 import { ReactQueryDemo } from '@/components/react-query-demo'
 import { useAuthStore } from '@/store/auth'
 import { useAccountMe } from '@/api/auth'
-import { useTagihanCheckLunas } from '@/api/santri'
+import { useSantriAsramaInfo, useTagihanCheckLunas } from '@/api/santri'
 import { usePengumuman } from '@/api/pengumuman'
 import { RequireAuth } from '@/components/auth-guard'
 import { BottomNav } from '@/components/bottom-nav'
@@ -95,9 +96,12 @@ export default function Page() {
 
   const spp = useTagihanCheckLunas(sppParams)
   const isSppLunas = Boolean(spp.data?.data?.is_lunas)
+  const asramaInfo = useSantriAsramaInfo(selectedStudentId)
 
   const pengumuman = usePengumuman({ page: 1, limit: 100 })
   const pengumumanItems = pengumuman.data?.data?.items ?? []
+  const asramaPayload = (asramaInfo.data?.data ?? asramaInfo.data) as any
+  const asramaData = asramaPayload?.asrama ? asramaPayload : null
 
   const bulanTahunLabel = useMemo(() => {
     const bulanNama = [
@@ -217,6 +221,56 @@ export default function Page() {
               </div>
             </section>
 
+            <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-[#e6eee8]">
+              <div className="mb-3 flex items-center gap-2 text-[#2a8b3e]">
+                <House className="h-6 w-6" />
+                <p className="text-md font-bold tracking-wide">INFO ASRAMA</p>
+              </div>
+
+              {!selectedStudentId ? (
+                <p className="text-md font-extrabold text-[#0d1e45]">Pilih santri</p>
+              ) : asramaInfo.isLoading ? (
+                <p className="text-md font-extrabold text-[#0d1e45]">Memuat...</p>
+              ) : asramaInfo.isError ? (
+                <p className="text-md font-extrabold text-[#0d1e45]">Gagal memuat</p>
+              ) : !asramaData || asramaPayload?.is_placed === false ? (
+                <p className="text-md font-extrabold text-[#0d1e45]">Belum ditempatkan di asrama</p>
+              ) : (
+                <div className="space-y-3">
+                  <div className="rounded-2xl bg-[#f6fbf7] p-4 ring-1 ring-[#e4eee7]">
+                    <p className="text-sm font-extrabold text-[#0f2147]">
+                      {asramaData?.asrama?.asr_nama ?? '-'}
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-[#6b7c9f]">
+                      {asramaData?.asrama?.asr_kode ?? '-'} • {asramaData?.asrama?.asr_jenis_display ?? '-'}
+                    </p>
+                    <p className="mt-1 text-xs font-semibold text-[#6b7c9f]">
+                      Lantai: {asramaData?.asrama?.asr_lantai ?? '-'} • Kapasitas: {asramaData?.asrama?.total_kapasitas ?? '-'}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-2 text-sm font-semibold text-[#23406f] sm:grid-cols-2">
+                    <p>
+                      Penempatan: <span className="font-extrabold">{asramaData?.penempatan?.pnph_kode ?? '-'}</span>
+                    </p>
+                    <p>
+                      Status: <span className="font-extrabold">{asramaData?.penempatan?.status ?? '-'}</span>
+                    </p>
+                    <p>
+                      Tgl Masuk: <span className="font-extrabold">{asramaData?.penempatan?.pnpd_tgl_masuk ?? '-'}</span>
+                    </p>
+                    <p>
+                      Ustadz: <span className="font-extrabold">{asramaData?.ustadz?.gur_nama ?? '-'}</span>
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {!asramaInfo.isLoading && !asramaInfo.isError && asramaInfo.data?.messages ? (
+                <p className="mt-2 text-sm font-medium text-[#6a7b9f]">{asramaInfo.data.messages}</p>
+              ) : null}
+            </section>
+            
             <section
               className={`rounded-3xl p-5 shadow-sm ring-1 ${isSppLunas ? 'bg-[#eef7ef] ring-[#cfe3d3]' : 'bg-[#fff3e6] ring-[#f0d9bd]'
                 }`}
@@ -241,6 +295,7 @@ export default function Page() {
                 <p className="mt-1 text-sm font-semibold text-[#8a6b3f]">{spp.data.messages}</p>
               ) : null}
             </section>
+
 
             <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1b8f3f] via-[#16823a] to-[#0f6a2e] px-5 py-4 text-white shadow-lg shadow-green-900/15 ring-1 ring-white/10">
               <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-white/10 blur-2xl" />
@@ -274,7 +329,7 @@ export default function Page() {
                     </p>
                   ) : (
                     <div className="mt-3 space-y-2">
-                      {pengumumanItems.slice(0, 3).map((item) => {
+                      {pengumumanItems.map((item) => {
                         const rawDate = item.start_date
                         const parsed = rawDate ? Date.parse(rawDate) : NaN
                         const dateLabel = Number.isFinite(parsed)

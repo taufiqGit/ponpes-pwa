@@ -284,3 +284,70 @@ export function useTagihanCheckLunas(
     ...options,
   })
 }
+
+export type SantriAsramaInfoAsrama = {
+  id?: number | null
+  asr_kode?: string | null
+  asr_nama?: string | null
+  asr_jenis?: string | null
+  asr_jenis_display?: string | null
+  asr_lokasi?: string | null
+  asr_lantai?: number | null
+  total_kapasitas?: number | null
+}
+
+export type SantriAsramaInfoPenempatan = {
+  id?: number | null
+  pnph_kode?: string | null
+  pnph_tgl_mulai?: string | null
+  pnph_tgl_selesai?: string | null
+  pnpd_tgl_masuk?: string | null
+  status?: string | null
+}
+
+export type SantriAsramaInfoUstadz = {
+  id?: number | string | null
+  gur_nip?: string | null
+  gur_nama?: string | null
+  gur_jenis_kelamin?: string | null
+  gur_telp?: string | null
+}
+
+export type SantriAsramaInfoData = {
+  is_placed?: boolean | null
+  santri_id?: number | null
+  santri_nama?: string | null
+  santri_nis?: string | null
+  asrama?: SantriAsramaInfoAsrama | null
+  penempatan?: SantriAsramaInfoPenempatan | null
+  ustadz?: SantriAsramaInfoUstadz | null
+}
+
+export type SantriAsramaInfoResponse = {
+  code?: number
+  status?: boolean
+  messages?: string
+  data?: SantriAsramaInfoData
+}
+
+export async function getSantriAsramaInfoApi(
+  santriId: string | number,
+): Promise<SantriAsramaInfoResponse> {
+  const res = await axiosInstance.get(`/api/santri/${santriId}/asrama-info`, {
+    validateStatus: () => true,
+  })
+  return (res.data?.data ?? res.data) as SantriAsramaInfoResponse
+}
+
+export function useSantriAsramaInfo(
+  santriId?: string | number | null,
+  options?: UseQueryOptions<SantriAsramaInfoResponse, Error>,
+) {
+  return useQuery<SantriAsramaInfoResponse, Error>({
+    queryKey: ['santri', santriId, 'asrama-info'],
+    queryFn: () => getSantriAsramaInfoApi(String(santriId)),
+    enabled: Boolean(santriId),
+    meta: { errorMessage: 'Gagal mengambil info asrama santri' },
+    ...options,
+  })
+}
