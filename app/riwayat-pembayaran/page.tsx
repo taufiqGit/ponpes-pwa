@@ -20,12 +20,6 @@ function formatRupiah(value: number) {
   return `Rp ${formatted}`
 }
 
-function splitInvoice(invoiceNumber: string) {
-  const lastDash = invoiceNumber.lastIndexOf('-')
-  if (lastDash === -1) return [invoiceNumber]
-  return [invoiceNumber.slice(0, lastDash + 1), invoiceNumber.slice(lastDash + 1)]
-}
-
 export default function RiwayatPembayaranPage() {
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [page, setPage] = useState(1)
@@ -103,23 +97,45 @@ export default function RiwayatPembayaranPage() {
               {!isLoading &&
                 !isError &&
                 pageRows.map((row, idx) => {
-                const invoiceLines = splitInvoice(row.invoiceNumber)
+                const tarifItems = [
+                  {
+                    kode: row.tarifKode,
+                    nama: row.tarifNama,
+                  },
+                  {
+                    kode: row.consumTarifKode,
+                    nama: row.consumTarifNama,
+                  },
+                ].filter((item) => item.kode || item.nama)
+
                 return (
                   <div
-                    key={row.invoiceNumber}
+                    key={row.invoiceNumber || `${row.date}-${idx}`}
                     className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#e6eee8]"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-xs font-bold tracking-widest text-[#7aa485]">
-                          INVOICE 
+                          TARIF
                         </p>
-                        <div className="mt-1 text-base font-extrabold text-[#0f2147]">
-                          {invoiceLines.map((line) => (
-                            <div key={line} className="truncate">
-                              {line}
-                            </div>
-                          ))}
+                        <div className="mt-1 space-y-1">
+                          {tarifItems.length > 0 ? (
+                            tarifItems.map((item, itemIdx) => (
+                              <div
+                                key={`${item.kode ?? 'tarif'}-${itemIdx}`}
+                                className="min-w-0"
+                              >
+                                <p className="truncate text-base font-extrabold text-[#0f2147]">
+                                  {item.kode || '-'}
+                                </p>
+                                <p className="truncate text-sm font-semibold text-[#6b7c9f]">
+                                  {item.nama || '-'}
+                                </p>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-base font-extrabold text-[#0f2147]">-</p>
+                          )}
                         </div>
                         <p className="mt-1 text-sm font-semibold text-[#6b7c9f]">
                           {row.period}
@@ -193,7 +209,7 @@ export default function RiwayatPembayaranPage() {
 
               <div className="flex items-center gap-4">
                 <span className="font-medium text-[#51657e]">
-                  {totalRows === 0 ? '0' : `${start + 1}-${end}`} dari {totalRows} invoice
+                  {totalRows === 0 ? '0' : `${start + 1}-${end}`} dari {totalRows} data
                 </span>
                 <div className="flex items-center gap-2">
                   <button

@@ -5,6 +5,10 @@ import { axiosInstance } from '@/lib/axios'
 
 export type InvoiceRow = {
   invoiceNumber: string
+  tarifKode?: string
+  tarifNama?: string
+  consumTarifKode?: string
+  consumTarifNama?: string
   period: string
   date: string
   amount: number
@@ -32,6 +36,20 @@ function normalizeInvoice(input: any): InvoiceRow {
   const invoiceNumber =
     input?.sytg_kode ??
     ''
+  const tarifKode =
+    input?.tarif?.sytr_kode ??
+    ''
+  const tarifNama =
+    input?.tarif?.sytr_nama ??
+    input?.tarif?.sytr_name ??
+    ''
+  const consumTarifKode =
+    input?.consum_tarif?.sytr_kode ??
+    ''
+  const consumTarifNama =
+    input?.consum_tarif?.sytr_nama ??
+    input?.consum_tarif?.sytr_name ??
+    ''
   const period =
     input?.period ??
     input?.periode ??
@@ -48,7 +66,18 @@ function normalizeInvoice(input: any): InvoiceRow {
   const note =
     input?.sytg_catatan ?? undefined
 
-  return { invoiceNumber, period, date, amount, status, note }
+  return {
+    invoiceNumber,
+    tarifKode,
+    tarifNama,
+    consumTarifKode,
+    consumTarifNama,
+    period,
+    date,
+    amount,
+    status,
+    note,
+  }
 }
 
 export async function getInvoicesApi(
@@ -67,14 +96,13 @@ export async function getInvoicesApi(
     },
   })
   const data = res.data?.data
-  console.log('datazz', res?.data)
   const raw =
     Array.isArray(data?.data) ? data?.data :
     Array.isArray(data?.records) ? data?.records :
     Array.isArray(data) ? data :
     []
   const records = raw.map(normalizeInvoice)
-  const total = data?.total ?? data?.meta?.total ?? records.length
+  const total = data?.total_records ?? data?.total ?? data?.meta?.total ?? records.length
   return { records, total }
 }
 

@@ -22,6 +22,7 @@ import { useSantriAsramaInfo, useTagihanCheckLunas } from '@/api/santri'
 import { usePengumuman } from '@/api/pengumuman'
 import { RequireAuth } from '@/components/auth-guard'
 import { BottomNav } from '@/components/bottom-nav'
+import { formatTanggal } from '@/lib/utils'
 
 type Student = {
   id: string
@@ -180,7 +181,11 @@ export default function Page() {
             </section>
 
             <section className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-[#e6eee8] md:p-5">
-              <p className="text-md font-bold tracking-wide text-[#7b8db0]">Pilih Santri</p>
+              <div className="mb-3 flex justify-between gap-2 text-[#2a8b3e]">
+                <p className="text-md font-bold tracking-wide text-[#7b8db0]">Pilih Santri</p>
+                <p className="text-sm tracking-wide text-[#7b8db0]">{account?.santri_ids?.length || 0} santri</p>
+              </div>
+
               <div className="mt-3 space-y-2">
                 <button
                   type="button"
@@ -204,8 +209,8 @@ export default function Page() {
                         key={student.id}
                         type="button"
                         className={`w-full rounded-xl px-3 py-2 text-left font-semibold transition ${student.id === selectedStudentId
-                            ? 'bg-[#2a8b3e] text-white'
-                            : 'text-[#23406f] hover:bg-[#f2f7f3]'
+                          ? 'bg-[#2a8b3e] text-white'
+                          : 'text-[#23406f] hover:bg-[#f2f7f3]'
                           }`}
                         onClick={() => {
                           setSelectedStudentId(student.id)
@@ -257,7 +262,7 @@ export default function Page() {
                       Status: <span className="font-extrabold">{asramaData?.penempatan?.status ?? '-'}</span>
                     </p>
                     <p>
-                      Tgl Masuk: <span className="font-extrabold">{asramaData?.penempatan?.pnpd_tgl_masuk ?? '-'}</span>
+                      Tgl Masuk: <span className="font-extrabold">{formatTanggal(asramaData?.penempatan?.pnpd_tgl_masuk) ?? '-'}</span>
                     </p>
                     <p>
                       Ustadz: <span className="font-extrabold">{asramaData?.ustadz?.gur_nama ?? '-'}</span>
@@ -271,30 +276,35 @@ export default function Page() {
               ) : null}
             </section>
 
-            <section
-              className={`rounded-3xl p-5 shadow-sm ring-1 ${isSppLunas ? 'bg-[#eef7ef] ring-[#cfe3d3]' : 'bg-[#fff3e6] ring-[#f0d9bd]'
-                }`}
-            >
-              <div className={`mb-3 flex items-center gap-2 ${isSppLunas ? 'text-[#2a8b3e]' : 'text-[#b45309]'}`}>
-                <Wallet className="h-6 w-6" />
-                <p className="text-md font-bold tracking-wide">STATUS SPP</p>
-              </div>
-              <p className="text-md font-extrabold text-[#0d1e45]">
-                {!selectedStudentId
-                  ? 'Pilih santri'
-                  : spp.isLoading
-                    ? 'Memuat...'
-                    : spp.isError
-                      ? 'Gagal memuat'
-                      : isSppLunas
-                        ? 'Lunas'
-                        : 'Belum Lunas'}
-              </p>
-              <p className="mt-2 text-base font-medium text-[#6a7b9f]">Bulan: {bulanTahunLabel}</p>
-              {!spp.isLoading && !spp.isError && !isSppLunas && spp.data?.messages ? (
-                <p className="mt-1 text-sm font-semibold text-[#8a6b3f]">{spp.data.messages}</p>
-              ) : null}
-            </section>
+            {
+              !isSppLunas ? (
+                <section
+                  className={`rounded-3xl p-5 shadow-sm ring-1 ${isSppLunas ? 'bg-[#eef7ef] ring-[#cfe3d3]' : 'bg-[#fff3e6] ring-[#f0d9bd]'
+                    }`}
+                >
+                  <div className={`mb-3 flex items-center gap-2 ${isSppLunas ? 'text-[#2a8b3e]' : 'text-[#b45309]'}`}>
+                    <Wallet className="h-6 w-6" />
+                    <p className="text-md font-bold tracking-wide">STATUS SPP</p>
+                  </div>
+                  <p className="text-md font-extrabold text-[#0d1e45]">
+                    {!selectedStudentId
+                      ? 'Pilih santri'
+                      : spp.isLoading
+                        ? 'Memuat...'
+                        : spp.isError
+                          ? 'Gagal memuat'
+                          : isSppLunas
+                            ? 'Lunas'
+                            : 'Belum Lunas'}
+                  </p>
+                  <p className="mt-2 text-base font-medium text-[#6a7b9f]">Bulan: {bulanTahunLabel}</p>
+                  {!spp.isLoading && !spp.isError && !isSppLunas && spp.data?.messages ? (
+                    <p className="mt-1 text-sm font-semibold text-[#8a6b3f]">{spp.data.messages}</p>
+                  ) : null}
+                </section>
+              ) : ''
+            }
+
 
 
             <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1b8f3f] via-[#16823a] to-[#0f6a2e] px-5 py-4 text-white shadow-lg shadow-green-900/15 ring-1 ring-white/10">
@@ -334,10 +344,10 @@ export default function Page() {
                         const parsed = rawDate ? Date.parse(rawDate) : NaN
                         const dateLabel = Number.isFinite(parsed)
                           ? new Date(parsed).toLocaleDateString('id-ID', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                            })
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          })
                           : null
 
                         return (

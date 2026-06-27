@@ -21,6 +21,12 @@ export type PenilaianKitabSantriResponse = {
   total?: number
 }
 
+export type PenilaianKitabSantriSummary = {
+  santri_id?: number | string | null
+  total_penilaian?: number | null
+  total_kitab?: number | null
+}
+
 function normalizePenilaian(input: any): PenilaianKitabSantriRow {
   const kitab_kode = input?.kitab?.kode_kitab ?? input?.kitab_kode
   const kitab_nama = input?.kitab?.nama_kitab ?? input?.kitab_nama
@@ -188,6 +194,32 @@ export function usePenilaianKitabSantri(
     queryFn: () => getPenilaianKitabSantriApi(String(santriId)),
     enabled: Boolean(santriId),
     meta: { errorMessage: 'Gagal mengambil data penilaian kitab santri' },
+    ...options,
+  })
+}
+
+export async function getPenilaianKitabSummarySantriApi(
+  santriId: string | number,
+): Promise<PenilaianKitabSantriSummary> {
+  const res = await axiosInstance.get(`/api/penilaian-kitab/summary/santri/${santriId}`)
+  const data = res.data?.data ?? res.data
+
+  return {
+    santri_id: data?.santri_id ?? santriId,
+    total_penilaian: data?.total_penilaian ?? null,
+    total_kitab: data?.total_kitab ?? null,
+  }
+}
+
+export function usePenilaianKitabSummarySantri(
+  santriId?: string | number | null,
+  options?: UseQueryOptions<PenilaianKitabSantriSummary, Error>,
+) {
+  return useQuery<PenilaianKitabSantriSummary, Error>({
+    queryKey: ['penilaian-kitab', 'summary', 'santri', santriId],
+    queryFn: () => getPenilaianKitabSummarySantriApi(String(santriId)),
+    enabled: Boolean(santriId),
+    meta: { errorMessage: 'Gagal mengambil summary penilaian kitab santri' },
     ...options,
   })
 }

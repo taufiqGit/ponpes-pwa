@@ -71,6 +71,7 @@ export function LoginForm() {
 
       try {
         localStorage.setItem('auth_token', token)
+
         router.push('/')
         router.refresh()
       } catch (error) {

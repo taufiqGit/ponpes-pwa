@@ -87,11 +87,11 @@ export default function PenilaianKategoriPage() {
 
               {selectedStudentId && summary && (
                 <div className="rounded-2xl bg-[#f7faf7] p-4 ring-1 ring-[#e6eee8]">
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
                     <div className="rounded-xl bg-white p-3 ring-1 ring-[#e6eee8]">
                       <div className="flex items-center gap-2 text-[#2a8b3e]">
                         <BarChart3 className="h-4 w-4" />
-                        <p className="text-[11px] font-bold tracking-widest">TOTAL NILAI</p>
+                        <p className="text-[11px] font-bold tracking-widest">TOTAL PENILAIAN</p>
                       </div>
                       <p className="mt-2 text-lg font-extrabold text-[#0f2147]">
                         {formatNilai(summary.total_penilaian)}
@@ -100,13 +100,13 @@ export default function PenilaianKategoriPage() {
                     <div className="rounded-xl bg-white p-3 ring-1 ring-[#e6eee8]">
                       <div className="flex items-center gap-2 text-[#2563eb]">
                         <Layers className="h-4 w-4" />
-                        <p className="text-[11px] font-bold tracking-widest">KATEGORI</p>
+                        <p className="text-[11px] font-bold tracking-widest">KATEGORI PENILAIAN</p>
                       </div>
                       <p className="mt-2 text-lg font-extrabold text-[#0f2147]">
                         {formatNilai(summary.total_kategori)}
                       </p>
                     </div>
-                    <div className="rounded-xl bg-white p-3 ring-1 ring-[#e6eee8] sm:col-span-1 col-span-2">
+                    {/* <div className="rounded-xl bg-white p-3 ring-1 ring-[#e6eee8] sm:col-span-1 col-span-2">
                       <div className="flex items-center gap-2 text-[#b45309]">
                         <Award className="h-4 w-4" />
                         <p className="text-[11px] font-bold tracking-widest">RATA-RATA</p>
@@ -114,7 +114,7 @@ export default function PenilaianKategoriPage() {
                       <p className="mt-2 text-lg font-extrabold text-[#0f2147]">
                         {formatNilai(summary.nilai_rata_rata)}
                       </p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               )}
@@ -144,7 +144,7 @@ export default function PenilaianKategoriPage() {
                 </div>
               )}
 
-              {selectedStudentId &&
+              {/* {selectedStudentId &&
                 !isLoading &&
                 !isError &&
                 byKategori.map((kategori, idx) => (
@@ -277,7 +277,7 @@ export default function PenilaianKategoriPage() {
                       ))}
                     </div>
                   </section>
-                ))}
+                ))} */}
 
               {selectedStudentId && !isLoading && !isError && byKategori.length === 0 && (
                 <div className="rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-[#e6eee8]">

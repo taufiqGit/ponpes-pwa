@@ -1,17 +1,30 @@
 'use client'
 
 import { useMemo } from 'react'
-import { ArrowLeft, BookOpen, GraduationCap, UserRound } from 'lucide-react'
+import { ArrowLeft, BarChart3, BookOpen, GraduationCap, UserRound } from 'lucide-react'
 import { RequireAuth } from '@/components/auth-guard'
 import { BottomNav } from '@/components/bottom-nav'
 import { useAuthStore } from '@/store/auth'
-import { usePenilaianKitabSantri } from '@/api/santri'
+import { usePenilaianKitabSantri, usePenilaianKitabSummarySantri } from '@/api/santri'
 import { useAccountMe } from '@/api/auth'
+
+function formatNilai(value: unknown) {
+  if (value === null || value === undefined) return '-'
+  if (typeof value === 'number') return String(value)
+  const asNumber = Number(value)
+  if (!Number.isNaN(asNumber)) return String(asNumber)
+  return String(value)
+}
 
 export default function PenilaianKitabPage() {
   const selectedStudentId = useAuthStore((state) => state.selectedStudentId)
   const account: any = useAccountMe().data
   const { data, isLoading, isError } = usePenilaianKitabSantri(selectedStudentId)
+  const {
+    data: summary,
+    isLoading: isSummaryLoading,
+    isError: isSummaryError,
+  } = usePenilaianKitabSummarySantri(selectedStudentId)
 
   const records = useMemo(() => data?.records ?? [], [data?.records])
   const selectedStudentName = useMemo(() => {
@@ -65,6 +78,46 @@ export default function PenilaianKitabPage() {
                 </div>
               )}
 
+              {selectedStudentId && isSummaryLoading && (
+                <div className="rounded-2xl bg-[#f7faf7] p-4 ring-1 ring-[#e6eee8]">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl bg-white p-3 ring-1 ring-[#e6eee8]">
+                      <div className="h-4 w-32 rounded bg-[#eef6f0]" />
+                      <div className="mt-2 h-6 w-12 rounded bg-[#eef6f0]" />
+                    </div>
+                    <div className="rounded-xl bg-white p-3 ring-1 ring-[#e6eee8]">
+                      <div className="h-4 w-28 rounded bg-[#eef6f0]" />
+                      <div className="mt-2 h-6 w-12 rounded bg-[#eef6f0]" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedStudentId && !isSummaryLoading && !isSummaryError && summary && (
+                <div className="rounded-2xl bg-[#f7faf7] p-4 ring-1 ring-[#e6eee8]">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl bg-white p-3 ring-1 ring-[#e6eee8]">
+                      <div className="flex items-center gap-2 text-[#2a8b3e]">
+                        <BarChart3 className="h-4 w-4" />
+                        <p className="text-[11px] font-bold tracking-widest">Total Penilaian</p>
+                      </div>
+                      <p className="mt-2 text-lg font-extrabold text-[#0f2147]">
+                        {formatNilai(summary.total_penilaian)}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-white p-3 ring-1 ring-[#e6eee8]">
+                      <div className="flex items-center gap-2 text-[#2563eb]">
+                        <BookOpen className="h-4 w-4" />
+                        <p className="text-[11px] font-bold tracking-widest">Total Kitab Dinilaiz</p>
+                      </div>
+                      <p className="mt-2 text-lg font-extrabold text-[#0f2147]">
+                        {formatNilai(summary.total_kitab)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {selectedStudentId &&
                 isLoading &&
                 Array.from({ length: 3 }).map((_, idx) => (
@@ -91,7 +144,7 @@ export default function PenilaianKitabPage() {
                   </p>
                 </div>
               )}
-
+{/* 
               {selectedStudentId &&
                 !isLoading &&
                 !isError &&
@@ -163,7 +216,7 @@ export default function PenilaianKitabPage() {
                       </p>
                     </div>
                   </div>
-                ))}
+                ))} */}
 
               {selectedStudentId && !isLoading && !isError && records.length === 0 && (
                 <div className="rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-[#e6eee8]">
